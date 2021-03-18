@@ -113,8 +113,16 @@ namespace NUnit.Framework.Internal
         /// <returns>True if the filter matches the an ancestor of the test</returns>
         public bool MatchParent(ITest test)
         {
-            return test.Parent != null && (Match(test.Parent) || MatchParent(test.Parent));
-        }
+            //return test.Parent != null && (Match(test.Parent) || MatchParent(test.Parent));
+
+            for(var p=test.Parent;!object.ReferenceEquals(p,null);p=p.Parent)
+            {
+                if (this.Match(p))
+                    return true;
+            }//for
+
+            return false;
+        }//MatchParent
 
         /// <summary>
         /// Determine whether any descendant of the test matches the filter criteria.

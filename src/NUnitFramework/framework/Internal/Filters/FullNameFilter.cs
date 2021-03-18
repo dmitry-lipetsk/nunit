@@ -37,6 +37,52 @@ namespace NUnit.Framework.Internal.Filters
         /// <param name="expectedValue">The name the filter will recognize.</param>
         public FullNameFilter(string expectedValue) : base(expectedValue) { }
 
+        public override bool Pass(ITest test, bool negated)
+        {
+               if(negated)
+                    return base.Pass(test, negated);
+
+               for(;;)
+               {
+                   if(test.GetType()==typeof(TestSuite))
+                   {
+                        var t=test as TestSuite;
+
+                        if (t.FullName.StartsWith(this.ExpectedValue))
+                        {
+                            if (t.FullName.Length==this.ExpectedValue.Length)
+                                return true;
+
+                            test=t.Parent;
+
+                            if (object.ReferenceEquals(test,null))
+                                return false;
+
+                            continue;
+                        }//if
+
+                        //Skip all parents TestSuite
+
+                        for(;;)
+                        {
+                            test=test.Parent;
+
+                            if (object.ReferenceEquals(test,null))
+                                return false;
+
+                            if (test.GetType()!=typeof(TestSuite))
+                                break;
+                        }//for[ever]
+
+                        continue;
+                   }//if
+
+                   break;
+               }//for[ever]
+
+               return base.Pass(test, negated);
+        }//Pass
+
         /// <summary>
         /// Match a test against a single value.
         /// </summary>

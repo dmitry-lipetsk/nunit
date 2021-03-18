@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using NUnit.Framework.Interfaces;
 
 namespace NUnit.Framework.Internal.Filters
@@ -38,6 +39,8 @@ namespace NUnit.Framework.Internal.Filters
         public CompositeFilter()
         {
             Filters = new List<TestFilter>();
+
+            Filters2__FullName = new CompositeFilterNode();
         }
 
         /// <summary>
@@ -45,8 +48,12 @@ namespace NUnit.Framework.Internal.Filters
         /// </summary>
         /// <param name="filters"></param>
         public CompositeFilter( params TestFilter[] filters )
+            :this()
         {
-            Filters = new List<TestFilter>(filters);
+            foreach(var f in filters)
+            {
+                this.Add(f);
+            }
         }
 
         /// <summary>
@@ -56,12 +63,19 @@ namespace NUnit.Framework.Internal.Filters
         public void Add(TestFilter filter)
         {
             Filters.Add(filter);
+
+            if (filter.GetType()==typeof(FullNameFilter))
+            {
+                 this.Filters2__FullName.Add((FullNameFilter)filter);
+            }
         }
 
         /// <summary>
         /// Return a list of the composing filters.
         /// </summary>
         public IList<TestFilter> Filters { get; }
+
+        public CompositeFilterNode Filters2__FullName { get; }
 
         /// <summary>
         /// Checks whether the CompositeFilter is matched by a test.

@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework.Interfaces;
 
@@ -54,9 +55,21 @@ namespace NUnit.Framework.Internal.Filters
         public override bool Pass( ITest test, bool negated )
         {
             if (negated)
+            {
                 return Filters.All(f => f.Pass(test, negated));
+            }
 
-            return Filters.Any(f => f.Pass(test, negated));
+            if (this.Filters2__FullName.Test(test.FullName))
+            {
+                return true;
+            }
+
+            if (this.Filters.Any(f => f.Pass(test, negated)))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
