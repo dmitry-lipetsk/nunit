@@ -23,7 +23,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using NUnit.Framework.Interfaces;
 
 namespace NUnit.Framework.Internal.Filters
