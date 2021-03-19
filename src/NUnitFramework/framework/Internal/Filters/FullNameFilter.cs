@@ -42,6 +42,10 @@ namespace NUnit.Framework.Internal.Filters
                if(negated)
                     return base.Pass(test, negated);
 
+               //---------------------------
+               if (this.IsRegex)
+                    return base.Pass(test, negated);
+
                for(;;)
                {
                    if(test.GetType()==typeof(TestSuite))
