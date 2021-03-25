@@ -50,9 +50,9 @@ namespace NUnit.Framework.Internal
         /// Creates a copy of the given suite with only the descendants that pass the specified filter.
         /// </summary>
         /// <param name="suite">The <see cref="ParameterizedMethodSuite"/> to copy.</param>
-        /// <param name="filter">Determines which descendants are copied.</param>
-        public ParameterizedMethodSuite(ParameterizedMethodSuite suite, ITestFilter filter)
-            : base(suite, filter)
+        /// <param name="tag">Tag.</param>
+        private ParameterizedMethodSuite(ParameterizedMethodSuite suite, in TagCreateEmptyClone tag)
+            : base(suite, tag)
         {
         }
 
@@ -79,12 +79,11 @@ namespace NUnit.Framework.Internal
         }
 
         /// <summary>
-        /// Creates a filtered copy of the test suite.
+        /// Creates an empty copy of the test suite.
         /// </summary>
-        /// <param name="filter">Determines which descendants are copied.</param>
-        public override TestSuite Copy(ITestFilter filter)
+        protected override TestSuite CreateEmptyClone()
         {
-            return new ParameterizedMethodSuite(this, filter);
+            return new ParameterizedMethodSuite(this, new TagCreateEmptyClone());
         }
     }
 }

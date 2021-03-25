@@ -58,9 +58,9 @@ namespace NUnit.Framework.Internal
         /// Creates a copy of the given suite with only the descendants that pass the specified filter.
         /// </summary>
         /// <param name="setUpFixture">The <see cref="SetUpFixture"/> to copy.</param>
-        /// <param name="filter">Determines which descendants are copied.</param>
-        public SetUpFixture(SetUpFixture setUpFixture, ITestFilter filter)
-            : base(setUpFixture, filter)
+        /// <param name="tag">Tag.</param>
+        private SetUpFixture(SetUpFixture setUpFixture, in TagCreateEmptyClone tag)
+            : base(setUpFixture, tag)
         {
         }
 
@@ -74,12 +74,11 @@ namespace NUnit.Framework.Internal
         public new ITypeInfo TypeInfo => base.TypeInfo!;
 
         /// <summary>
-        /// Creates a filtered copy of the test suite.
+        /// Creates an empty copy of the test suite.
         /// </summary>
-        /// <param name="filter">Determines which descendants are copied.</param>
-        public override TestSuite Copy(ITestFilter filter)
+        protected override TestSuite CreateEmptyClone()
         {
-            return new SetUpFixture(this, filter);
+            return new SetUpFixture(this, new TagCreateEmptyClone());
         }
 
         #endregion

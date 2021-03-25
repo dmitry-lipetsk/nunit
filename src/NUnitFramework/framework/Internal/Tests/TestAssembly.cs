@@ -65,12 +65,20 @@ namespace NUnit.Framework.Internal
         /// Creates a copy of the given assembly with only the descendants that pass the specified filter.
         /// </summary>
         /// <param name="assembly">The <see cref="TestAssembly"/> to copy.</param>
-        /// <param name="filter">Determines which descendants are copied.</param>
-        public TestAssembly(TestAssembly assembly, ITestFilter filter)
-            : base(assembly as TestSuite, filter)
+        /// <param name="tag">Tag.</param>
+        private TestAssembly(TestAssembly assembly, in TagCreateEmptyClone tag)
+            : base(assembly as TestSuite, tag)
         {
             this.Name     = assembly.Name;
             this.Assembly = assembly.Assembly;
+        }
+
+        /// <summary>
+        /// Creates empty clone.
+        /// </summary>
+        public TestAssembly PleaseCreateEmptyClone()
+        {
+            return new TestAssembly(this, new TagCreateEmptyClone());
         }
 
         /// <summary>
@@ -101,12 +109,11 @@ namespace NUnit.Framework.Internal
         }
 
         /// <summary>
-        /// Creates a filtered copy of the test suite.
+        /// Creates an empty copy of the test suite.
         /// </summary>
-        /// <param name="filter">Determines which descendants are copied.</param>
-        public override TestSuite Copy(ITestFilter filter)
+        protected override TestSuite CreateEmptyClone()
         {
-            return new TestAssembly(this, filter);
+            return this.PleaseCreateEmptyClone();
         }
     }
 }

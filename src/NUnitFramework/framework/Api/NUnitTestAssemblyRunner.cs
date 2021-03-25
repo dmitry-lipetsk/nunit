@@ -197,7 +197,14 @@ namespace NUnit.Framework.Api
             if (filter == TestFilter.Empty)
                 return LoadedTest;
 
-            return new TestAssembly(LoadedTest as TestAssembly, filter);
+            var src = (TestAssembly)LoadedTest;
+
+            var r = src.Filter(filter);
+
+            if(object.ReferenceEquals(r,null))
+                r = src.PleaseCreateEmptyClone();
+
+            return r;
         }
 
         /// <summary>

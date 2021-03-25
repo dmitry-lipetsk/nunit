@@ -35,6 +35,11 @@ namespace NUnit.Framework.Internal
     /// </summary>
     public class TestSuite : Test
     {
+        /// <summary>
+        /// tag
+        /// </summary>
+        protected struct TagCreateEmptyClone{ };
+
         #region Fields
 
         /// <summary>
@@ -99,8 +104,8 @@ namespace NUnit.Framework.Internal
         /// Creates a copy of the given suite with only the descendants that pass the specified filter.
         /// </summary>
         /// <param name="suite">The <see cref="TestSuite"/> to copy.</param>
-        /// <param name="filter">Determines which descendants are copied.</param>
-        public TestSuite(TestSuite suite, ITestFilter filter)
+        /// <param name="tag">Tag.</param>
+        protected TestSuite(TestSuite suite,in TagCreateEmptyClone tag)
             : this(suite.Name)
         {
             this.FullName = suite.FullName;
@@ -111,24 +116,49 @@ namespace NUnit.Framework.Internal
             foreach (string key in suite.Properties.Keys)
             foreach (object val in suite.Properties[key])
                 this.Properties.Add(key, val);
+        }
 
-            foreach (var child in suite.tests)
+        /// <summary>
+        /// Creates a copy of the given suite with only the descendants that pass the specified filter.
+        /// </summary>
+        /// <param name="filter">The filter.</param>
+        public TestSuite? Filter(ITestFilter filter)
+        {
+            if (filter == TestFilter.Empty)
+                return this;
+
+            TestSuite? r=null;
+            
+            foreach (var child in this.tests)
             {
-                if(filter.Pass(child))
+                if(!filter.Pass(child))
+                     continue;
+
+                if(child.IsSuite)
                 {
-                    if(child.IsSuite)
-                    {
-                        TestSuite childSuite = ((TestSuite)child).Copy(filter);
-                        childSuite.Parent    = this;
-                        this.tests.Add(childSuite);
-                    }
-                    else
-                    {
-                        this.tests.Add(child);
-                    }
+                     TestSuite? childSuite = ((TestSuite)child).Filter(filter);
+                     
+                     if(object.ReferenceEquals(childSuite,null))
+                         continue;
+                     
+                     childSuite.Parent = this;
+
+                     if(object.ReferenceEquals(r,null))
+                          r = this.CreateEmptyClone();
+
+                     r.tests.Add(childSuite);
+                }
+                else
+                {
+                     if(object.ReferenceEquals(r,null))
+                          r = this.CreateEmptyClone();
+
+                     r.tests.Add(child);
                 }
             }
-        }
+
+            return r;
+        }//Filter
 
         #endregion
 
@@ -181,12 +211,11 @@ namespace NUnit.Framework.Internal
         }
 
         /// <summary>
-        /// Creates a filtered copy of the test suite.
+        /// Creates an empty copy of the test suite.
         /// </summary>
-        /// <param name="filter">Determines which descendants are copied.</param>
-        public virtual TestSuite Copy(ITestFilter filter)
+        protected virtual TestSuite CreateEmptyClone()
         {
-            return new TestSuite(this, filter);
+            return new TestSuite(this, new TagCreateEmptyClone());
         }
 
         #endregion
