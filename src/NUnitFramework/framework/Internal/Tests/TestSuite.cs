@@ -24,6 +24,7 @@
 #nullable enable
 
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Framework.Interfaces;
@@ -144,14 +145,26 @@ namespace NUnit.Framework.Internal
                      childSuite.Parent = this;
 
                      if(object.ReferenceEquals(r,null))
+                     {
                           r = this.CreateEmptyClone();
+
+                          Debug.Assert(!object.ReferenceEquals(r, null));
+
+                          Debug.Assert(r!.GetType()==this.GetType());
+                     }
 
                      r.tests.Add(childSuite);
                 }
                 else
                 {
                      if(object.ReferenceEquals(r,null))
+                     {
                           r = this.CreateEmptyClone();
+
+                          Debug.Assert(!object.ReferenceEquals(r, null));
+
+                          Debug.Assert(r!.GetType()==this.GetType());
+                     }
 
                      r.tests.Add(child);
                 }
